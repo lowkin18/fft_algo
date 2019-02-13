@@ -7,8 +7,8 @@
 
 
 
-double arrVal[ARR_SIZE]={0,1,2,3,4,5,6,7};
-double complex bins[ARR_SIZE];
+double arrVal[ARR_SIZE]={0,1,0,1,0,1,0,1,0,1,1,0,0,1,1,0};
+complex double bins[ARR_SIZE];
 
 
 
@@ -27,10 +27,10 @@ int main()
 
     }
     */
-    FFT_order_array(arrVal,ARR_SIZE);
+    //FFT_order_array(arrVal,ARR_SIZE);
 
 
-     if(fft_algorithm(arrVal,bins,0,ARR_SIZE-1,ARR_SIZE))
+     if(fft_algorithm(arrVal,bins,0,ARR_SIZE,ARR_SIZE))
     {
         printf("Array Sorted\n");
     }

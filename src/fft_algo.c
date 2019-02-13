@@ -64,6 +64,7 @@ void FFT_order_array(double arr[],int size)
  * @param total_size 
  * @return int 
  */
+/*
 int fft_algorithm(double * arr,double complex *bins, int left,int right, int total_size)
 {
 
@@ -122,29 +123,23 @@ int fft_algorithm(double * arr,double complex *bins, int left,int right, int tot
     //Now need to join values and bubble up;
     return 1;
 }
+*/
+//TRYING AN IN PLACE FFT, THIS WASN'T WORKING SO I WILL COME BACK TO IT ONCE I GET AN FFT WORKING.
 
 
 
-
-
-
-/*
-
-TRYING AN IN PLACE FFT, THIS WASN'T WORKING SO I WILL COME BACK TO IT ONCE I GET AN FFT WORKING.
-
-
-
-int fft_algorithm(double * arr,double complex *bins, int index,int right, int total_size)
+int fft_algorithm(double * arr,complex double *bins, int index,int current_size, int total_size)
 {
     if(current_size == 1) return 1; //base case
     int next_size = current_size/2;
     int ptr_jump = total_size/current_size;
     int bindex; //INDEX OF BINS
-
-    fft_algorithm(arr,bins,index,next_size,total_size);
-    fft_algorithm(arr,bins,index+ptr_jump,next_size,total_size);
+    complex double * even_bin = (complex double * )malloc(next_size*sizeof(complex double));
+    complex double * odd_bin = (complex double * )malloc(next_size*sizeof(complex double));
+    fft_algorithm(arr,even_bin,index,next_size,total_size);
+    fft_algorithm(arr,odd_bin,index+ptr_jump,next_size,total_size);
     
-    bindex = index%2==0 ? index:index+1; // INDEX FOR THE BIN OUTPUT;
+
    // printf("INDEX %d",index);
     //printf("bindex = %d\n");
 
@@ -152,36 +147,52 @@ int fft_algorithm(double * arr,double complex *bins, int index,int right, int to
     if(current_size ==2) //BASE CASE where Wn is easy
     {
         bindex = index%2==0 ? index:index+current_size+1; // INDEX FOR THE BIN OUTPUT;
-        bins[bindex] = arr[index] + arr[index+ptr_jump];
-        bins[bindex+1] = arr[index] - arr[index+ptr_jump];
+        bins[0] = arr[index] + arr[index+ptr_jump];
+        bins[1] = arr[index] - arr[index+ptr_jump];
         bin_check[bindex] = arr[index] + arr[index+ptr_jump];
         bin_check[bindex+1] = arr[index] - arr[index+ptr_jump];
     }
     else
     {
-    int iMult = 1; // index multiplier to match bins going forward and rap around
-    int h_ptr_j = ptr_jump/2; // INDEX multiplier to match G(k) + Twiddle * H(k)
-    
+    complex double * temp_array;
+    temp_array = (complex double * )malloc(current_size*sizeof(complex double));
+    int ptr_jump = total_size/current_size; // NEEDED FOR Wn
+    for(int l= 0; l < current_size/2;l++)
+        {
+        bin_check[l] = cabs(even_bin[l]);
+        bin_check[l+2] = cabs(odd_bin[l+2]);
+        }
     for(int i = 0; i < current_size; i++)
         {
-            double complex twiddle_factor = cos((E_PI*i*ptr_jump)/current_size) - I*sin((E_PI*i*ptr_jump)/current_size);
-            if(i>=current_size/2) iMult =-1;
             if(i==0){
-               bins[bindex+i] = bins[bindex+i] + 1*bins[bindex+ptr_jump*iMult];
+               temp_array[i] = even_bin[i] + 1*odd_bin[i];
             } 
             else
             {
-               bins[bindex+i] = bins[bindex+i] + twiddle_factor*bins[bindex+i+ptr_jump*iMult];
-            }         
+                double twid_real = cos((E_PI*2*i*ptr_jump)/total_size);
+                double twid_imag = -sin((E_PI*2*i*ptr_jump)/total_size);
+                complex double twiddle_factor = twid_real + I*twid_imag;
+                if(i<current_size/2)
+                {
+                temp_array[i] = even_bin[i] + twiddle_factor*odd_bin[i];
+                }
+                else
+                {
+                temp_array[i] = odd_bin[-(current_size)/2+i] + twiddle_factor*even_bin[-(current_size)/2+i];
+                }
+            }
+                    
         }
         for(int k = 0; k < current_size;k++)
         {
+        bins[k] = temp_array[k];
         bin_check[k] = cabs(bins[k]);
         }
+    free(temp_array);
     }
-    
+    free(even_bin);
+    free(odd_bin);
     //Now need to join values and bubble up;
     return 1;
 }
 
-*/
