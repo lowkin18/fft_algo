@@ -16,7 +16,7 @@ add_library(
     src/fft_algo.c
 )
 
-add_executable(fft_algo_test test/fft_algo_test.cpp)
+add_executable(fft_algo_test test/fft_algo_test.c)
 target_link_libraries(fft_algo_test fft_algo)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})

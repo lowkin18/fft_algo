@@ -4,5 +4,11 @@
 			"path": "."
 		}
 	],
-	"settings": {}
+	"settings": {
+		"files.associations": {
+			"fft_algo.h": "c",
+			"stdio.h": "c",
+			"complex.h": "c"
+		}
+	}
 }
