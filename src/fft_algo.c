@@ -2,14 +2,10 @@
 
 //only RADIX 2 sizing capable need to make modifications if using variable size sample
 // trying to implement the algorithm as inplace and bubble up amounts
-
 #include "fft_algo.h"
 
-
-
-//LOOK UP ARRAYS TO PUT THE SAMPLES IN REVERSE BIT ORDER
-
-#if 1
+//LOOK UP ARRAYS TO PUT THE SAMPLES IN REVERSE BIT ORDER DON'T NEED THEM WITH CURRENT IMPLEMENTATION
+#if 0
 double bin_check[ARR_SIZE] = {0,0,0,0,0,0,0,0};
 
 int bit_r_8[8] = {0 ,4 ,2 ,6 ,1 ,5 ,3 ,7};
@@ -78,7 +74,76 @@ void FFT_order_array(double arr[],int size)
 }
 
 
+/**
+ * @brief function that will perform the FFT with DCT based the simplest Cooley & Tukey method
+ * 
+ * 
+ * @param arr 
+ * @param double 
+ * @param index 
+ * @param current_size 
+ * @param total_size 
+ * @return int 
+ */
+int fft_algorithm(double * arr,complex double *bins, int index,int current_size, int total_size)
+{
+    if(current_size == 1) return 1; //base case
+    int next_size = current_size/2;
+    int ptr_jump = total_size/current_size;
+    int bindex; //INDEX OF BINS
 
+    //CREATE TWO NEW BINS TO PASS TO THE NEXT LAYER DOWN THESE BINS WILL BUBBLE UP
+    complex double * even_bin = (complex double * )malloc(next_size*sizeof(complex double));
+    complex double * odd_bin = (complex double * )malloc(next_size*sizeof(complex double));
+    fft_algorithm(arr,even_bin,index,next_size,total_size); //CALL FFT AGAIN ON N/2
+    fft_algorithm(arr,odd_bin,index+ptr_jump,next_size,total_size); //CALL FFT AGAIN ON N/2
+
+    //BASE CASE WHERE N = 2 COMBINE TO CREATE 2 SAMPLE DFT
+    if(current_size ==2) //BASE CASE where Wn is easy
+    {
+        bindex = index%2==0 ? index:index+current_size+1; // INDEX FOR THE BIN OUTPUT;
+        bins[0] = arr[index] + arr[index+ptr_jump];
+        bins[1] = arr[index] - arr[index+ptr_jump];
+        bin_check[bindex] = arr[index] + arr[index+ptr_jump]; //BIN CHECK IS FOR CHECKING OUTPUT
+        bin_check[bindex+1] = arr[index] - arr[index+ptr_jump];
+    }
+    //WHEN DFT LENGTH IS GREATER THAN 2 - THIS MERGES THE EVEN AND ODD BACK TOGETHER AND FORMS NEXT LEVEL BINS
+    else
+    {      
+    int ptr_jump = total_size/current_size; //DETERMINES THE POWER OF Wn TERM
+    for(int i = 0; i < current_size; i++)   //LOOPS THROUGH ODD AND EVEN MERGING THEM
+        {
+            if(i==0){
+               bins[i] = even_bin[i] + 1*odd_bin[i]; // FIRST BIN FROM ODD AND EVEN TWIDDLE ALWAYS 1
+            } 
+            else
+            {
+                double twid_real = cos((E_PI*2*i*ptr_jump)/total_size); //REAL TWIDDLE FACTOR
+                double twid_imag = -sin((E_PI*2*i*ptr_jump)/total_size); //IMAG TWIDDLE FACTOR
+                complex double twiddle_factor = twid_real + I*twid_imag; //COMBINE TO CREATE COMPLEX NUMBER
+                
+                if(i<current_size/2)//WHEN WE ADD EVEN TO TWIDDLED ODDS
+                {
+                bins[i] = even_bin[i] + twiddle_factor*odd_bin[i];
+                }
+                else //WHEN WE ADD ODDS TO TWIDDLED EVENS
+                {
+                bins[i] = odd_bin[-(current_size)/2+i] + twiddle_factor*even_bin[-(current_size)/2+i]; //OFFSET TO ZERO SO 0 REFERENCED FOR FIRST ODD
+                }
+            }
+                    
+        }
+    }
+    free(even_bin); //FREE THE DYNAMIC ARRAYS
+    free(odd_bin); //FREE THE DYNAMIC ARRAYS
+    //Now need to join values and bubble up;
+    return 1; //RETURN 1 ON CONDITION PASSED ::: NO ERROR CHECKING YET
+}
+
+
+
+//THIS IS AN IMPLEMENTATION THAT WILL PROBABLY RUN FASTER THAN THE ABOVE FUNCTION BUT REQUIRES THE ARRAY TO BE 
+// IN BIT ORDER ALREADY - MAY REVISIT THIS IF I FIND A FAST METHOD TO IMPLEMENT BIT ORDERING
 /**
  * @brief 
  * 
@@ -89,6 +154,7 @@ void FFT_order_array(double arr[],int size)
  * @param total_size 
  * @return int 
  */
+/*
 int fft_algorithm(double * arr,double complex *bins, int left,int right, int total_size)
 {
 
@@ -147,66 +213,5 @@ int fft_algorithm(double * arr,double complex *bins, int left,int right, int tot
     //Now need to join values and bubble up;
     return 1;
 }
-
-
-
-
-
-
-/*
-
-TRYING AN IN PLACE FFT, THIS WASN'T WORKING SO I WILL COME BACK TO IT ONCE I GET AN FFT WORKING.
-
-
-
-int fft_algorithm(double * arr,double complex *bins, int index,int right, int total_size)
-{
-    if(current_size == 1) return 1; //base case
-    int next_size = current_size/2;
-    int ptr_jump = total_size/current_size;
-    int bindex; //INDEX OF BINS
-
-    fft_algorithm(arr,bins,index,next_size,total_size);
-    fft_algorithm(arr,bins,index+ptr_jump,next_size,total_size);
-    
-    bindex = index%2==0 ? index:index+1; // INDEX FOR THE BIN OUTPUT;
-   // printf("INDEX %d",index);
-    //printf("bindex = %d\n");
-
-    if(current_size ==2)printf("index: %d and first value: %f, index %d and second value %f \n",index,arr[index],(index+ptr_jump),arr[index+ptr_jump]); //testing if in place split works
-    if(current_size ==2) //BASE CASE where Wn is easy
-    {
-        bindex = index%2==0 ? index:index+current_size+1; // INDEX FOR THE BIN OUTPUT;
-        bins[bindex] = arr[index] + arr[index+ptr_jump];
-        bins[bindex+1] = arr[index] - arr[index+ptr_jump];
-        bin_check[bindex] = arr[index] + arr[index+ptr_jump];
-        bin_check[bindex+1] = arr[index] - arr[index+ptr_jump];
-    }
-    else
-    {
-    int iMult = 1; // index multiplier to match bins going forward and rap around
-    int h_ptr_j = ptr_jump/2; // INDEX multiplier to match G(k) + Twiddle * H(k)
-    
-    for(int i = 0; i < current_size; i++)
-        {
-            double complex twiddle_factor = cos((E_PI*i*ptr_jump)/current_size) - I*sin((E_PI*i*ptr_jump)/current_size);
-            if(i>=current_size/2) iMult =-1;
-            if(i==0){
-               bins[bindex+i] = bins[bindex+i] + 1*bins[bindex+ptr_jump*iMult];
-            } 
-            else
-            {
-               bins[bindex+i] = bins[bindex+i] + twiddle_factor*bins[bindex+i+ptr_jump*iMult];
-            }         
-        }
-        for(int k = 0; k < current_size;k++)
-        {
-        bin_check[k] = cabs(bins[k]);
-        }
-    }
-    
-    //Now need to join values and bubble up;
-    return 1;
-}
-
 */
+//TRYING AN IN PLACE FFT, THIS WASN'T WORKING SO I WILL COME BACK TO IT ONCE I GET AN FFT WORKING.
