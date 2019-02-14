@@ -54,24 +54,6 @@ int bit_r_1024[1024] = {0 ,512 ,256 ,768 ,128 ,640 ,384 ,896 ,64 ,576 ,320 ,832 
 #endif 
 
 
-/**
- * @brief 
- * 
- * @param arr 
- * @param size 
- */
-void FFT_order_array(double arr[],int size)
-{
-    double complex temp_array[1024];
-    for(int i = 0; i < size ;i++)
-    {
-        temp_array[i] = arr[bit_r_1024[i]];
-    }
-      for(int i = 0; i < size ;i++)
-    {
-        arr[i] = temp_array[i];
-    }
-}
 
 
 /**
@@ -90,8 +72,6 @@ int fft_algorithm(double * arr,complex double *bins, int index,int current_size,
     if(current_size == 1) return 1; //base case
     int next_size = current_size/2;
     int ptr_jump = total_size/current_size;
-    int bindex; //INDEX OF BINS
-
     //CREATE TWO NEW BINS TO PASS TO THE NEXT LAYER DOWN THESE BINS WILL BUBBLE UP
     complex double * even_bin = (complex double * )malloc(next_size*sizeof(complex double));
     complex double * odd_bin = (complex double * )malloc(next_size*sizeof(complex double));
@@ -101,11 +81,8 @@ int fft_algorithm(double * arr,complex double *bins, int index,int current_size,
     //BASE CASE WHERE N = 2 COMBINE TO CREATE 2 SAMPLE DFT
     if(current_size ==2) //BASE CASE where Wn is easy
     {
-        bindex = index%2==0 ? index:index+current_size+1; // INDEX FOR THE BIN OUTPUT;
         bins[0] = arr[index] + arr[index+ptr_jump];
         bins[1] = arr[index] - arr[index+ptr_jump];
-        bin_check[bindex] = arr[index] + arr[index+ptr_jump]; //BIN CHECK IS FOR CHECKING OUTPUT
-        bin_check[bindex+1] = arr[index] - arr[index+ptr_jump];
     }
     //WHEN DFT LENGTH IS GREATER THAN 2 - THIS MERGES THE EVEN AND ODD BACK TOGETHER AND FORMS NEXT LEVEL BINS
     else
@@ -119,7 +96,7 @@ int fft_algorithm(double * arr,complex double *bins, int index,int current_size,
             else
             {
                 double twid_real = cos((E_PI*2*i*ptr_jump)/total_size); //REAL TWIDDLE FACTOR
-                double twid_imag = -sin((E_PI*2*i*ptr_jump)/total_size); //IMAG TWIDDLE FACTOR
+                double twid_imag = sin((E_PI*2*i*ptr_jump)/total_size); //IMAG TWIDDLE FACTOR
                 complex double twiddle_factor = twid_real + I*twid_imag; //COMBINE TO CREATE COMPLEX NUMBER
                 
                 if(i<current_size/2)//WHEN WE ADD EVEN TO TWIDDLED ODDS
@@ -215,3 +192,27 @@ int fft_algorithm(double * arr,double complex *bins, int left,int right, int tot
 }
 */
 //TRYING AN IN PLACE FFT, THIS WASN'T WORKING SO I WILL COME BACK TO IT ONCE I GET AN FFT WORKING.
+
+
+//FUNCTION COMMENTED OUT BECAUSE NOT USED IN THIS IMPLEMENTATION OF THE FFT -- WILL REFACTOR IT OUT WHEN I DETERMINE THE SPEED
+//OF EITHER FUNCTION
+/**
+ * @brief 
+ * 
+ * @param arr 
+ * @param size 
+ */
+/*
+void FFT_order_array(double arr[],int size)
+{
+    double complex temp_array[1024];
+    for(int i = 0; i < size ;i++)
+    {
+        temp_array[i] = arr[bit_r_1024[i]];
+    }
+      for(int i = 0; i < size ;i++)
+    {
+        arr[i] = temp_array[i];
+    }
+}
+*/
