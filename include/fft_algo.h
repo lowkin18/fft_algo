@@ -8,7 +8,7 @@
 
 #define E_PI 3.1415926535897932384626433832795028841971693993751058209749445923078164062
 
-#define ARR_SIZE 8
+#define ARR_SIZE 1024
 
 #ifndef FFT_ALGO_HEADER
 #define FFT_ALGO_HEADER
@@ -32,7 +32,7 @@
  * @param arr 
  * @param size 
  */
-void FFT_order_array(double arr[],int size);
+void FFT_order_array(float arr[],int size);
 
 
 /**
@@ -43,7 +43,7 @@ void FFT_order_array(double arr[],int size);
  * @param end 
  * @return int 
  */
-int test_fft(double arr[],int start,int end);
+int test_fft(float arr[],int start,int end);
 
 
 /**
@@ -51,17 +51,17 @@ int test_fft(double arr[],int start,int end);
  *        Total_size must be radix 2 otherwise function wont work
  * 
  * @param arr 
- * @param complex double - This is the bins
+ * @param complex float - This is the bins
  * @param index 
  * @param index_right 
  * @param total_size 
  * @return int 
  */
-int fft_algorithm(double * arr,complex double *bins,int left, int right, int total_size);
+int fft_algorithm(float * arr,complex float *bins,int left, int right, int total_size);
 
 
 
 
 
 //NEXT STEP IS WRITE THE IFFT
-int ifft_algorithm(double * arr,complex double *bins,int left, int right, int total_size);
+int ifft_algorithm(float * arr,complex float *bins,int left, int right, int total_size);

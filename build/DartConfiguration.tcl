@@ -4,14 +4,14 @@
 
 
 # Configuration directories and files
-SourceDirectory: C:/Users/kipke/Documents/ElectricalEngineering/Projects/C_projects/FFT/fft_algo
-BuildDirectory: C:/Users/kipke/Documents/ElectricalEngineering/Projects/C_projects/FFT/fft_algo/build
+SourceDirectory: C:/Users/kipke/OneDrive/Documents/Programming/C_PROJECTS/FFT_C
+BuildDirectory: C:/Users/kipke/OneDrive/Documents/Programming/C_PROJECTS/FFT_C/build
 
 # Where to place the cost data store
 CostDataFile: 
 
 # Site is something like machine.domain, i.e. pragmatic.crd
-Site: DESKTOP-MI9UHOH
+Site: DESKTOP-JALEM6D
 
 # Build name is osname-revision-compiler, i.e. Linux-2.4.2-2smp-c++
 BuildName: Win32-mingw32-make
@@ -36,7 +36,7 @@ ScpCommand: C:/Windows/System32/OpenSSH/scp.exe
 NightlyStartTime: 00:00:00 EDT
 
 # Commands for the build/test/submit cycle
-ConfigureCommand: "C:/Program Files/CMake/bin/cmake.exe" "C:/Users/kipke/Documents/ElectricalEngineering/Projects/C_projects/FFT/fft_algo"
+ConfigureCommand: "C:/Program Files/CMake/bin/cmake.exe" "C:/Users/kipke/OneDrive/Documents/Programming/C_PROJECTS/FFT_C"
 MakeCommand: C:/Program\ Files/CMake/bin/cmake.exe --build . --config "${CTEST_CONFIGURATION_TYPE}" -- -i
 DefaultCTestConfigurationType: Release
 
@@ -54,7 +54,7 @@ SVNOptions:
 SVNUpdateOptions: 
 
 # Git options
-GITCommand: GITCOMMAND-NOTFOUND
+GITCommand: C:/Program Files/Git/cmd/git.exe
 GITInitSubmodules: 
 GITUpdateOptions: 
 GITUpdateCustom: 
@@ -67,7 +67,7 @@ P4UpdateOptions:
 P4UpdateCustom: 
 
 # Generic update command
-UpdateCommand: GITCOMMAND-NOTFOUND
+UpdateCommand: C:/Program Files/Git/cmd/git.exe
 UpdateOptions: 
 UpdateType: git
 

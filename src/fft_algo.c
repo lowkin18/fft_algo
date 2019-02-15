@@ -6,7 +6,7 @@
 
 //LOOK UP ARRAYS TO PUT THE SAMPLES IN REVERSE BIT ORDER DON'T NEED THEM WITH CURRENT IMPLEMENTATION
 #if 0
-double bin_check[ARR_SIZE] = {0,0,0,0,0,0,0,0};
+float bin_check[ARR_SIZE] = {0,0,0,0,0,0,0,0};
 
 int bit_r_8[8] = {0 ,4 ,2 ,6 ,1 ,5 ,3 ,7};
 int bit_r_16[16] = {0 ,8 ,4 ,12 ,2 ,10 ,6 ,14 ,1 ,9 ,5 ,13 ,3 ,11 ,7 ,15};
@@ -61,25 +61,25 @@ int bit_r_1024[1024] = {0 ,512 ,256 ,768 ,128 ,640 ,384 ,896 ,64 ,576 ,320 ,832 
  * 
  * 
  * @param arr 
- * @param double 
+ * @param float 
  * @param index 
  * @param current_size 
  * @param total_size 
  * @return int 
  */
-int fft_algorithm(double * arr,complex double *bins, int index,int current_size, int total_size)
+int fft_algorithm(float * arr,complex float *bins, int index,int current_size, int total_size)
 {
     if(current_size == 1) return 1; //base case
     int next_size = current_size/2;
     int ptr_jump = total_size/current_size;
     //CREATE TWO NEW BINS TO PASS TO THE NEXT LAYER DOWN THESE BINS WILL BUBBLE UP
-    complex double * even_bin = (complex double * )malloc(next_size*sizeof(complex double));
-    complex double * odd_bin = (complex double * )malloc(next_size*sizeof(complex double));
+    complex float * even_bin = (complex float * )malloc(next_size*sizeof(complex float));
+    complex float * odd_bin = (complex float * )malloc(next_size*sizeof(complex float));
     fft_algorithm(arr,even_bin,index,next_size,total_size); //CALL FFT AGAIN ON N/2
     fft_algorithm(arr,odd_bin,index+ptr_jump,next_size,total_size); //CALL FFT AGAIN ON N/2
 
     //BASE CASE WHERE N = 2 COMBINE TO CREATE 2 SAMPLE DFT
-    if(current_size ==2) //BASE CASE where Wn is easy
+    if(current_size==2) //BASE CASE where Wn is easy
     {
         bins[0] = arr[index] + arr[index+ptr_jump];
         bins[1] = arr[index] - arr[index+ptr_jump];
@@ -95,25 +95,17 @@ int fft_algorithm(double * arr,complex double *bins, int index,int current_size,
             } 
             else
             {
-                double twid_real = cos((E_PI*2*i*ptr_jump)/total_size); //REAL TWIDDLE FACTOR
-                double twid_imag = sin((E_PI*2*i*ptr_jump)/total_size); //IMAG TWIDDLE FACTOR
-                complex double twiddle_factor = twid_real + I*twid_imag; //COMBINE TO CREATE COMPLEX NUMBER
-                
-                if(i<current_size/2)//WHEN WE ADD EVEN TO TWIDDLED ODDS
-                {
+                float twid_real = cos((E_PI*2*i*ptr_jump)/total_size); //REAL TWIDDLE FACTOR
+                float twid_imag = sin((E_PI*2*i*ptr_jump)/total_size); //IMAG TWIDDLE FACTOR
+                complex float twiddle_factor = twid_real + I*twid_imag; //COMBINE TO CREATE COMPLEX NUMBER
                 bins[i] = even_bin[i] + twiddle_factor*odd_bin[i];
-                }
-                else //WHEN WE ADD ODDS TO TWIDDLED EVENS
-                {
-                bins[i] = odd_bin[-(current_size)/2+i] + twiddle_factor*even_bin[-(current_size)/2+i]; //OFFSET TO ZERO SO 0 REFERENCED FOR FIRST ODD
-                }
+                bins[i] = odd_bin[i] + twiddle_factor*even_bin[i]; //OFFSET TO ZERO SO 0 REFERENCED FOR FIRST ODD
             }
                     
         }
     }
     free(even_bin); //FREE THE DYNAMIC ARRAYS
     free(odd_bin); //FREE THE DYNAMIC ARRAYS
-    //Now need to join values and bubble up;
     return 1; //RETURN 1 ON CONDITION PASSED ::: NO ERROR CHECKING YET
 }
 
@@ -132,7 +124,7 @@ int fft_algorithm(double * arr,complex double *bins, int index,int current_size,
  * @return int 
  */
 /*
-int fft_algorithm(double * arr,double complex *bins, int left,int right, int total_size)
+int fft_algorithm(float * arr,float complex *bins, int left,int right, int total_size)
 {
 
     if(left>=right) return 1; //base case
@@ -156,13 +148,13 @@ int fft_algorithm(double * arr,double complex *bins, int left,int right, int tot
     
     int ptr_jump = total_size/current_size; // NEEDED FOR Wn
     int iMult = 1; //Multiplier to rollover Twiddles
-    double complex * temp_array;
-    temp_array = (double complex * )malloc(current_size*sizeof(double complex));
+    float complex * temp_array;
+    temp_array = (float complex * )malloc(current_size*sizeof(float complex));
     for(int i = 0; i < current_size; i++)
         {
-            double twid_real = cos((E_PI*2*i*ptr_jump)/total_size);
-            double twid_imag = -sin((E_PI*2*i*ptr_jump)/total_size);
-            double complex twiddle_factor = twid_real + I*twid_imag;
+            float twid_real = cos((E_PI*2*i*ptr_jump)/total_size);
+            float twid_imag = -sin((E_PI*2*i*ptr_jump)/total_size);
+            float complex twiddle_factor = twid_real + I*twid_imag;
 
             if(i==0){
                temp_array[i] = bins[left+i] + 1*bins[left+current_size/2+i];
@@ -203,9 +195,9 @@ int fft_algorithm(double * arr,double complex *bins, int left,int right, int tot
  * @param size 
  */
 /*
-void FFT_order_array(double arr[],int size)
+void FFT_order_array(float arr[],int size)
 {
-    double complex temp_array[1024];
+    float complex temp_array[1024];
     for(int i = 0; i < size ;i++)
     {
         temp_array[i] = arr[bit_r_1024[i]];
