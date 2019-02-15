@@ -35,15 +35,6 @@
 void FFT_order_array(float arr[],int size);
 
 
-/**
- * @brief Tests the FFT generated
- * 
- * @param arr 
- * @param start 
- * @param end 
- * @return int 
- */
-int test_fft(float arr[],int start,int end);
 
 
 /**
@@ -58,8 +49,6 @@ int test_fft(float arr[],int start,int end);
  * @return int 
  */
 int fft_algorithm(float * arr,complex float *bins,int left, int right, int total_size);
-
-
 
 
 
