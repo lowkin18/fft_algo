@@ -88,10 +88,11 @@ int fft_algorithm(float * arr,complex float *bins, int index,int current_size, i
     else
     {      
     int ptr_jump = total_size/current_size; //DETERMINES THE POWER OF Wn TERM
-    for(int i = 0; i < current_size; i++)   //LOOPS THROUGH ODD AND EVEN MERGING THEM
+    for(int i = 0; i < current_size/2; i++)   //LOOPS THROUGH ODD AND EVEN MERGING THEM
         {
             if(i==0){
                bins[i] = even_bin[i] + 1*odd_bin[i]; // FIRST BIN FROM ODD AND EVEN TWIDDLE ALWAYS 1
+               bins[i+current_size/2] = odd_bin[i] - 1*even_bin[i];
             } 
             else
             {
@@ -99,7 +100,7 @@ int fft_algorithm(float * arr,complex float *bins, int index,int current_size, i
                 float twid_imag = sin((E_PI*2*i*ptr_jump)/total_size); //IMAG TWIDDLE FACTOR
                 complex float twiddle_factor = twid_real + I*twid_imag; //COMBINE TO CREATE COMPLEX NUMBER
                 bins[i] = even_bin[i] + twiddle_factor*odd_bin[i];
-                bins[i] = odd_bin[i] + twiddle_factor*even_bin[i]; //OFFSET TO ZERO SO 0 REFERENCED FOR FIRST ODD
+                bins[i+current_size/2] = odd_bin[i] - twiddle_factor*even_bin[i]; //OFFSET TO ZERO SO 0 REFERENCED FOR FIRST ODD
             }
                     
         }
