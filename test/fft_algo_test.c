@@ -16,12 +16,18 @@
  */
 int test_fft(float arr[],int start,int end);
 
-#if 0
-float arrVal[ARR_SIZE]={0 ,1 ,2 ,3 ,4 ,5 ,6 ,7} ;
+#if 1
+float arrVal[ARR_SIZE]={0,
+0.154508497187474,
+0.293892626146237,
+0.404508497187474,
+0.475528258147577,
+0.500000000000000,
+0.475528258147577,
+0.404508497187474} ;
 #endif
 
 float complex bins[ARR_SIZE];
-
 
 
 int main()
